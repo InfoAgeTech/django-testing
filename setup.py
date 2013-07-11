@@ -17,7 +17,7 @@ setup(
     description='testing for django',
     author='Troy Grosfield',
     author_email='troy.grosfield@gmail.com',
-    url='https://github.com/troygrosfield/django-testing',
+    url='https://github.com/InfoAgeTech/django-testing',
     # license='MIT',
     packages=find_packages(),
     include_package_data=True,
