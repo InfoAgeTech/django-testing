@@ -7,9 +7,6 @@ class BaseUrlTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print('NOTE: {0} are running which will slow down the speed '
-              'of the tests since it queries all the view mixins as '
-              'well.'.format(cls.__name__))
         super(BaseUrlTestCase, cls).setUpClass()
 
 
