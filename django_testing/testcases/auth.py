@@ -5,7 +5,11 @@ from ..user_utils import create_user
 
 
 class UnauthenticatedUserTestCase(unittest.TestCase):
-    pass
+
+    @classmethod
+    def setUpClass(cls):
+        super(UnauthenticatedUserTestCase, cls).setUpClass()
+        cls.client = Client()
 
 
 class AuthenticatedUserTestCase(unittest.TestCase):
