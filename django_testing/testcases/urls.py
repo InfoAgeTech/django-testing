@@ -61,11 +61,12 @@ class UrlTestCaseMixin(object):
                 missing_url_names.append(t[5:])
 
         self.assertEqual(missing_tests, set([]),
-            msg=u'{0} is missing tests for the following url names: {1}\n\n'
-                 'Test method names should following the pattern '
+            msg=u'{0} is missing tests for the following {1} url names:\n\n '
+                 '* {2}\n\nTest method names should following the pattern '
                  '"test_{{url_name}}_view".'.format(
                                             self.__class__.__name__,
-                                            u', '.join(missing_url_names)))
+                                            len(missing_url_names),
+                                            u'\n * '.join(missing_url_names)))
 
     def status_code_200_response_test(self, url):
         """Test that a response returns a successful 200 response."""
