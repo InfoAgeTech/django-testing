@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.core.urlresolvers import RegexURLPattern
 
 
 class UrlTestCaseMixin(object):
@@ -9,6 +10,11 @@ class UrlTestCaseMixin(object):
     * expected_url_tests: a list of test names to test urls
     * urlpatterns: this is a tuple of url patterns (likely coming from urls.py)
     * url_names = a collection of string url names to test.
+
+    If the test case needs to ignore url patterns, then set the test case
+    attribute:
+
+    * exclude_urlpatterns: urlpatterns to exclude from the testcase
 
     Example:
 
@@ -37,8 +43,24 @@ class UrlTestCaseMixin(object):
         if hasattr(cls, 'url_names') and cls.url_names:
             return cls.url_names
 
+        exclude_urlpatterns = getattr(cls, 'exclude_urlpatterns', [])
+
+        if (exclude_urlpatterns and
+            isinstance(exclude_urlpatterns[0], RegexURLPattern)):
+            # There's only one set of url patterns to exclude
+            exclude_patterns = exclude_urlpatterns
+
+        else:
+            # There are multiple lists of url patterns to exclude
+            exclude_patterns = []
+            for p in exclude_urlpatterns:
+                exclude_patterns += p
+
+        exclude_url_names = [p.name for p in exclude_patterns]
+
         if hasattr(cls, 'urlpatterns'):
-            return [p.name for p in cls.urlpatterns if hasattr(p, 'name')]
+            return [p.name for p in cls.urlpatterns
+                    if hasattr(p, 'name') and p.name not in exclude_url_names]
 
     def test_all_views_tested(self):
         """This test ensures that all urls have a test written for them."""
