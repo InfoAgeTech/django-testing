@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
 random_string = lambda len = None: uuid.uuid4().hex[:len or 10]
 

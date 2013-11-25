@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test.client import Client
 from django.utils import unittest
+
 from ..user_utils import create_user
 
 
