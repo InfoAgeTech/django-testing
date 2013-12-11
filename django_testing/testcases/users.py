@@ -3,9 +3,6 @@ from django.utils import unittest
 from django_testing.user_utils import create_user
 
 
-User = get_user_model()
-
-
 class SingleUserTestCase(unittest.TestCase):
 
     @classmethod
@@ -16,4 +13,8 @@ class SingleUserTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         super(SingleUserTestCase, cls).tearDownClass()
-        cls.user.delete()
+        try:
+            cls.user.delete()
+        except:
+            # Don't care if this fails.
+            pass
