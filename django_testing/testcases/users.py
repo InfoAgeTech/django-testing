@@ -1,9 +1,9 @@
 
-from django.utils import unittest
+from django.test import TestCase
 from django_testing.user_utils import create_user
 
 
-class SingleUserTestCase(unittest.TestCase):
+class SingleUserTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
