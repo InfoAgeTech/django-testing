@@ -90,7 +90,54 @@ class UrlTestCaseMixin(object):
                                             len(missing_url_names),
                                             u'\n * '.join(missing_url_names)))
 
-    def status_code_200_response_test(self, url):
-        """Test that a response returns a successful 200 response."""
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+    def response_test_get(self, url, data=None, expected_status_code=200,
+                          **kwargs):
+        """Helper for http GET requests.  Default status code is 200.
+
+        :param url: the url the test hits.
+        :param data: the data use to pass to the url. This becomes
+            querystring params. See:
+            https://docs.djangoproject.com/en/1.6/topics/testing/overview/#django.test.client.Client.get
+        :param expected_status_code: the status code to assert from the request
+        :param kwargs: any other pieces of data to pass to the GET request
+        """
+        return self.response_test(method='get',
+                                  url=url,
+                                  expected_status_code=expected_status_code,
+                                  data=data,
+                                  **kwargs)
+
+
+    def response_test_post(self, url, data=None, expected_status_code=302,
+                           **kwargs):
+        """Helper for http POST requests.  Default status code is 302,
+        redirect.
+
+        :param url: the url the test hits.
+        :param data: the data use to pass to the url. This is POST data
+            https://docs.djangoproject.com/en/1.6/topics/testing/overview/#django.test.client.Client.post
+        :param expected_status_code: the status code to assert from the request
+        :param kwargs: any other pieces of data to pass to the GET request
+        """
+        return self.response_test(method='post',
+                                  url=url,
+                                  expected_status_code=expected_status_code,
+                                  data=data,
+                                  **kwargs)
+
+    def response_test(self, method, url, expected_status_code, data=None,
+                      **kwargs):
+        """Helper for HTTP method tests.
+
+        :param method: string that can be ONE of the following http methods:
+            GET, POST, HEAD, PUT, DELETE.
+        :param url: the url the test hits.
+        :param expected_status_code: the status code to assert from the request
+        """
+        if data != None:
+            kwargs['data'] = data
+
+        http_method_func = getattr(self.client, method.lower())
+        response = http_method_func(url, **kwargs)
+        self.assertEqual(response.status_code, expected_status_code)
+        return response
