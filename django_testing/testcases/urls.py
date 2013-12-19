@@ -139,5 +139,16 @@ class UrlTestCaseMixin(object):
 
         http_method_func = getattr(self.client, method.lower())
         response = http_method_func(url, **kwargs)
-        self.assertEqual(response.status_code, expected_status_code)
+
+        if (response.status_code != expected_status_code and
+            'form' in response.context):
+            error_message = u'AssertionError: {0} != {1}: \n{2}'.format(
+                                            response.status_code,
+                                            expected_status_code,
+                                            response.context['form']._errors)
+        else:
+            error_message = None
+
+        self.assertEqual(response.status_code, expected_status_code,
+                        msg=error_message)
         return response
