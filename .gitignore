@@ -1,7 +1,8 @@
 .project
 .pydevproject
 .DS_Store
+.idea
+.settings
 *.pyc
-.settings/
-/bb.log
-/django_user_connections.db
+*.log
+*.db
