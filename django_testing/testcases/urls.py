@@ -107,7 +107,6 @@ class UrlTestCaseMixin(object):
                                   data=data,
                                   **kwargs)
 
-
     def response_test_post(self, url, data=None, expected_status_code=302,
                            **kwargs):
         """Helper for http POST requests.  Default status code is 302,
@@ -137,6 +136,8 @@ class UrlTestCaseMixin(object):
         if data != None:
             kwargs['data'] = data
 
+        # Gets the function off self.client for the specific http method.
+        # Method == "get" will return the self.client's "get(...)" method.
         http_method_func = getattr(self.client, method.lower())
         response = http_method_func(url, **kwargs)
 
