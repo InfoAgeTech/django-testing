@@ -24,7 +24,7 @@ setup(
     description='testing for django',
     author='Troy Grosfield',
     maintainer='Troy Grosfield',
-    url='https://github.com/InfoAgeTech/django-testing',
+    url='https://github.com/infoagetech/django-testing',
     license='MIT',
     packages=find_packages(),
     include_package_data=True,
