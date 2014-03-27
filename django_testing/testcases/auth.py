@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.test.client import Client
-from django.utils import unittest
+from django.test.testcases import TestCase
 
 from ..user_utils import create_user
 
 
-class UnauthenticatedUserTestCase(unittest.TestCase):
+class UnauthenticatedUserTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -13,7 +14,7 @@ class UnauthenticatedUserTestCase(unittest.TestCase):
         cls.client = Client()
 
 
-class AuthenticatedUserTestCase(unittest.TestCase):
+class AuthenticatedUserTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
