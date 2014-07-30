@@ -11,7 +11,7 @@ class UnauthenticatedUserTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(UnauthenticatedUserTestCase, cls).setUpClass()
-        cls.client = Client()
+        cls.user_client = Client()
 
 
 class AuthenticatedUserTestCase(TestCase):
@@ -21,5 +21,6 @@ class AuthenticatedUserTestCase(TestCase):
         super(AuthenticatedUserTestCase, cls).setUpClass()
         user_password = 'testinghelloworld'
         cls.user = create_user(password=user_password)
-        cls.auth_client = Client()
-        cls.auth_client.login(username=cls.user.username, password=user_password)
+        cls.user_client = Client()
+        cls.user_client.login(username=cls.user.username,
+                              password=user_password)

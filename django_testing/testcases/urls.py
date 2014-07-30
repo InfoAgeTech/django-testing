@@ -16,6 +16,7 @@ class UrlTestCaseMixin(object):
     attribute:
 
     * exclude_urlpatterns: urlpatterns to exclude from the testcase
+    * exclude_url_names: url names to exclude
 
     Example:
 
@@ -58,6 +59,8 @@ class UrlTestCaseMixin(object):
                 exclude_patterns += p
 
         exclude_url_names = [p.name for p in exclude_patterns]
+        exclude_url_names.extend(getattr(cls, 'exclude_url_names', []))
+        exclude_url_names = list(set(exclude_url_names))
 
         if hasattr(cls, 'urlpatterns'):
 
@@ -148,8 +151,8 @@ class UrlTestCaseMixin(object):
             kwargs['data'] = data
 
         # Gets the function off self.client for the specific http method.
-        # Method == "get" will return the self.client's "get(...)" method.
-        http_method_func = getattr(self.auth_client, method.lower())
+        # Method == "get" will return the self.user_client's "get(...)" method.
+        http_method_func = getattr(self.user_client, method.lower())
         response = http_method_func(url, **kwargs)
 
         if (response.status_code != expected_status_code and
