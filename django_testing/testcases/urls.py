@@ -60,8 +60,18 @@ class UrlTestCaseMixin(object):
         exclude_url_names = [p.name for p in exclude_patterns]
 
         if hasattr(cls, 'urlpatterns'):
-            return [p.name for p in cls.urlpatterns
-                    if hasattr(p, 'name') and p.name not in exclude_url_names]
+
+            url_pattern_names = []
+            def get_url_pattern_names(urllist, depth=0):
+                for entry in urllist:
+                    if hasattr(entry, 'url_patterns'):
+                        get_url_pattern_names(entry.url_patterns, depth + 1)
+                    elif entry.name not in exclude_url_names:
+                        url_pattern_names.append(entry.name)
+
+            get_url_pattern_names(cls.urlpatterns)
+
+            return url_pattern_names
 
     def test_all_views_tested(self):
         """This test ensures that all urls have a test written for them."""
