@@ -154,13 +154,23 @@ class UrlTestCaseMixin(object):
         # Method == "get" will return the self.user_client's "get(...)" method.
         http_method_func = getattr(self.user_client, method.lower())
         response = http_method_func(url, **kwargs)
+        is_correct_status_code = response.status_code == expected_status_code
 
-        if (response.status_code != expected_status_code and
+        if (not is_correct_status_code and
+            response.context and
             'form' in response.context):
-            error_message = u'AssertionError: {0} != {1}: \n{2}'.format(
-                                            response.status_code,
-                                            expected_status_code,
-                                            response.context['form']._errors)
+            error_message = 'AssertionError: {0} != {1}: \n{2}'.format(
+                response.status_code,
+                expected_status_code,
+                response.context['form']._errors
+            )
+        elif not is_correct_status_code and response.status_code == 302:
+            error_message = ('AssertionError: {0} != {1}: \nUnexpected '
+                             'redirect to: {2}').format(
+                response.status_code,
+                expected_status_code,
+                response.url
+            )
         else:
             error_message = None
 

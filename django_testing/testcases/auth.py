@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.test.client import Client
+from django.test import Client
 from django.test.testcases import TestCase
 
 from ..user_utils import create_user
