@@ -7,7 +7,8 @@ User = get_user_model()
 random_string = lambda len = None: uuid.uuid4().hex[:len or 10]
 
 
-def create_user(username=None, email=None, **kwargs):
+def create_user(username=None, email=None, is_staff=False, is_superuser=False,
+                **kwargs):
 
     if not username:
         username = random_string()
@@ -21,4 +22,19 @@ def create_user(username=None, email=None, **kwargs):
     if 'last_name' not in kwargs:
         kwargs['last_name'] = random_string()
 
-    return User.objects.create_user(username=username, email=email, **kwargs)
+    kwargs['username'] = username
+    kwargs['email'] = email
+
+    if 'password' not in kwargs:
+        kwargs['password'] = 'password'
+
+    if is_superuser:
+        return User.objects.create_superuser(**kwargs)
+
+    user = User.objects.create_user(**kwargs)
+
+    if is_staff:
+        user.is_staff = True
+        user.save()
+
+    return user
