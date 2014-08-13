@@ -3,106 +3,8 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import RegexURLPattern
 
 
-class UrlTestCaseMixin(object):
-    """Url Test case for urls.
-
-    The consuming TestCase must implement one of the following attributes:
-
-    * expected_url_tests: a list of test names to test urls
-    * urlpatterns: this is a tuple of url patterns (likely coming from urls.py)
-    * url_names = a collection of string url names to test.
-
-    If the test case needs to ignore url patterns, then set the test case
-    attribute:
-
-    * exclude_urlpatterns: urlpatterns to exclude from the testcase
-    * exclude_url_names: url names to exclude
-
-    Example:
-
-    from user_connections.urls import urlpatterns
-
-    class UserConnectionGetUrlTests(BaseUrlTestCase):
-        urlpatterns = urlpatterns
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        super(UrlTestCaseMixin, cls).setUpClass()
-        cls.actual_url_test_names = [t for t in cls.__dict__.keys()
-                                     if t.startswith('test_')]
-
-        if not hasattr(cls, 'expected_url_tests'):
-
-            cls.url_names = cls.get_url_names()
-
-            if hasattr(cls, 'url_names') and cls.url_names:
-                cls.expected_url_tests = [u'test_{0}_view'.format(n)
-                                          for n in cls.url_names]
-
-    @classmethod
-    def get_url_names(cls):
-        if hasattr(cls, 'url_names') and cls.url_names:
-            return cls.url_names
-
-        exclude_urlpatterns = getattr(cls, 'exclude_urlpatterns', [])
-
-        if (exclude_urlpatterns and
-            isinstance(exclude_urlpatterns[0], RegexURLPattern)):
-            # There's only one set of url patterns to exclude
-            exclude_patterns = exclude_urlpatterns
-
-        else:
-            # There are multiple lists of url patterns to exclude
-            exclude_patterns = []
-            for p in exclude_urlpatterns:
-                exclude_patterns += p
-
-        exclude_url_names = [p.name for p in exclude_patterns]
-        exclude_url_names.extend(getattr(cls, 'exclude_url_names', []))
-        exclude_url_names = list(set(exclude_url_names))
-
-        if hasattr(cls, 'urlpatterns'):
-
-            url_pattern_names = []
-            def get_url_pattern_names(urllist, depth=0):
-                for entry in urllist:
-                    if hasattr(entry, 'url_patterns'):
-                        get_url_pattern_names(entry.url_patterns, depth + 1)
-                    elif entry.name not in exclude_url_names:
-                        url_pattern_names.append(entry.name)
-
-            get_url_pattern_names(cls.urlpatterns)
-
-            return url_pattern_names
-
-    def test_all_views_tested(self):
-        """This test ensures that all urls have a test written for them."""
-
-        if not hasattr(self, 'expected_url_tests'):
-            raise Exception(u'"expected_url_tests" or "urlpatterns" must be '
-                             'implemented by TestCase {0}'.format(
-                                                    self.__class__.__name__))
-
-        missing_tests = set(self.expected_url_tests).difference(
-                                                    self.actual_url_test_names)
-        missing_url_names = []
-        for t in missing_tests:
-            if not t.startswith('test_'):
-                continue
-
-            if t.endswith('_view'):
-                missing_url_names.append(t[5:-5])
-            else:
-                missing_url_names.append(t[5:])
-
-        self.assertEqual(missing_tests, set([]),
-            msg=u'{0} is missing tests for the following {1} url names:\n\n '
-                 '* {2}\n\nTest method names should following the pattern '
-                 '"test_{{url_name}}_view".'.format(
-                                            self.__class__.__name__,
-                                            len(missing_url_names),
-                                            u'\n * '.join(missing_url_names)))
+class HttpResponseTestMixin(object):
+    """Test mixin for testing different http responses by url."""
 
     def response_test_get(self, url, data=None, expected_status_code=200,
                           **kwargs):
@@ -147,7 +49,7 @@ class UrlTestCaseMixin(object):
         :param url: the url the test hits.
         :param expected_status_code: the status code to assert from the request
         """
-        if data != None:
+        if data is not None:
             kwargs['data'] = data
 
         # Gets the function off self.client for the specific http method.
@@ -156,9 +58,10 @@ class UrlTestCaseMixin(object):
         response = http_method_func(url, **kwargs)
         is_correct_status_code = response.status_code == expected_status_code
 
-        if (not is_correct_status_code and
-            response.context and
-            'form' in response.context):
+        if not is_correct_status_code and \
+           response.context and \
+           'form' in response.context:
+
             error_message = 'AssertionError: {0} != {1}: \n{2}'.format(
                 response.status_code,
                 expected_status_code,
@@ -175,5 +78,111 @@ class UrlTestCaseMixin(object):
             error_message = None
 
         self.assertEqual(response.status_code, expected_status_code,
-                        msg=error_message)
+                         msg=error_message)
         return response
+
+
+class UrlTestCaseMixin(HttpResponseTestMixin):
+    """Url Test case for urls.
+
+    The consuming TestCase must implement one of the following attributes:
+
+    * expected_url_tests: a list of test names to test urls
+    * urlpatterns: this is a tuple of url patterns (likely coming from urls.py)
+    * url_names = a collection of string url names to test.
+
+    If the test case needs to ignore url patterns, then set the test case
+    attribute:
+
+    * exclude_urlpatterns: urlpatterns to exclude from the testcase
+    * exclude_url_names: url names to exclude
+
+    Example:
+
+    from user_connections.urls import urlpatterns
+
+    class UserConnectionGetUrlTests(BaseUrlTestCase):
+        urlpatterns = urlpatterns
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(UrlTestCaseMixin, cls).setUpClass()
+        cls.actual_url_test_names = [t for t in cls.__dict__.keys()
+                                     if t.startswith('test_')]
+
+        if not hasattr(cls, 'expected_url_tests'):
+
+            cls.url_names = cls.get_url_names()
+
+            if hasattr(cls, 'url_names') and cls.url_names:
+                cls.expected_url_tests = [u'test_{0}_view'.format(n)
+                                          for n in cls.url_names]
+
+    @classmethod
+    def get_url_names(cls):
+        if hasattr(cls, 'url_names') and cls.url_names:
+            return cls.url_names
+
+        exclude_urlpatterns = getattr(cls, 'exclude_urlpatterns', [])
+
+        if exclude_urlpatterns and \
+           isinstance(exclude_urlpatterns[0], RegexURLPattern):
+            # There's only one set of url patterns to exclude
+            exclude_patterns = exclude_urlpatterns
+
+        else:
+            # There are multiple lists of url patterns to exclude
+            exclude_patterns = []
+            for p in exclude_urlpatterns:
+                exclude_patterns += p
+
+        exclude_url_names = [p.name for p in exclude_patterns]
+        exclude_url_names.extend(getattr(cls, 'exclude_url_names', []))
+        exclude_url_names = list(set(exclude_url_names))
+
+        if hasattr(cls, 'urlpatterns'):
+
+            url_pattern_names = []
+
+            def get_url_pattern_names(urllist, depth=0):
+                for entry in urllist:
+                    if hasattr(entry, 'url_patterns'):
+                        get_url_pattern_names(entry.url_patterns, depth + 1)
+                    elif entry.name not in exclude_url_names:
+                        url_pattern_names.append(entry.name)
+
+            get_url_pattern_names(cls.urlpatterns)
+
+            return url_pattern_names
+
+    def test_all_views_tested(self):
+        """This test ensures that all urls have a test written for them."""
+
+        if not hasattr(self, 'expected_url_tests'):
+            raise Exception('"expected_url_tests" or "urlpatterns" must be '
+                            'implemented by TestCase {0}'.format(
+                                                    self.__class__.__name__))
+
+        missing_tests = set(self.expected_url_tests).difference(
+                                                    self.actual_url_test_names)
+        missing_url_names = []
+        for t in missing_tests:
+            if not t.startswith('test_'):
+                continue
+
+            if t.endswith('_view'):
+                missing_url_names.append(t[5:-5])
+            else:
+                missing_url_names.append(t[5:])
+
+        msg = ('{0} is missing tests for the following {1} url names:\n\n '
+               '* {2}\n\nTest method names should following the pattern '
+               '"test_{{url_name}}_view".')
+        msg = msg.format(
+            self.__class__.__name__,
+            len(missing_url_names),
+            '\n * '.join(missing_url_names)
+        )
+        self.assertEqual(missing_tests, set([]), msg=msg)
+
