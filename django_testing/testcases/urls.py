@@ -185,4 +185,3 @@ class UrlTestCaseMixin(HttpResponseTestMixin):
             '\n * '.join(missing_url_names)
         )
         self.assertEqual(missing_tests, set([]), msg=msg)
-
