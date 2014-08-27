@@ -31,6 +31,18 @@ class ClassBasedViewTestResponse(object):
 
         return view.as_view()(request, **view_kwargs)
 
+    def get_post_response(self, view, url, user, data=None,
+                          request_kwargs=None, view_kwargs=None, **kwargs):
+        """Gets the post response for a class based view."""
+        kwargs['method'] = 'post'
+        return self.get_response(view=view,
+                                 url=url,
+                                 user=user,
+                                 data=data,
+                                 request_kwargs=request_kwargs,
+                                 view_kwargs=view_kwargs,
+                                 **kwargs)
+
     def get_ajax_response(self, view, url, user, data=None, method='get',
                           request_kwargs=None, view_kwargs=None, **kwargs):
         """
@@ -48,3 +60,18 @@ class ClassBasedViewTestResponse(object):
                                  request_kwargs=request_kwargs,
                                  view_kwargs=view_kwargs,
                                  **kwargs)
+
+    def get_ajax_post_response(self, view, url, user, data=None,
+                               request_kwargs=None, view_kwargs=None,
+                               **kwargs):
+        """
+        Gets a class base view's ajax response.
+        """
+        kwargs['method'] = 'post'
+        return self.get_ajax_response(view=view,
+                                      url=url,
+                                      user=user,
+                                      data=data,
+                                      request_kwargs=request_kwargs,
+                                      view_kwargs=view_kwargs,
+                                      **kwargs)
