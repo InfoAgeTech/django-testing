@@ -3,8 +3,8 @@ import uuid
 from django.contrib.auth import get_user_model
 
 
-User = get_user_model()
-random_string = lambda len = None: uuid.uuid4().hex[:len or 10]
+def random_string(length=10):
+    return uuid.uuid4().hex[:length]
 
 
 def create_user(username=None, email=None, is_staff=False, is_superuser=False,
@@ -27,6 +27,8 @@ def create_user(username=None, email=None, is_staff=False, is_superuser=False,
 
     if 'password' not in kwargs:
         kwargs['password'] = 'password'
+
+    User = get_user_model()
 
     if is_superuser:
         return User.objects.create_superuser(**kwargs)
