@@ -5,7 +5,8 @@ class ClassBasedViewTestResponse(object):
     """Gets a response from a class based view via the request factory."""
 
     def get_response(self, view, url, user, data=None, method='get',
-                     request_kwargs=None, view_kwargs=None, **kwargs):
+                     request_kwargs=None, view_kwargs=None, as_view_kwargs=None,
+                     **kwargs):
         """
         Get a response for a class based view.
 
@@ -16,6 +17,8 @@ class ClassBasedViewTestResponse(object):
         :param method: the http view method to test ('get', 'post', etc)
         :param request_kwargs: the kwargs to apply to the request method
         :param view_kwargs: dict of args to apply to the view
+        :param as_view_kwargs: the kwargs to apply when a view call the
+            ".as_view(...)" method.
         """
         if view_kwargs is None:
             view_kwargs = {}
@@ -28,6 +31,9 @@ class ClassBasedViewTestResponse(object):
 
         request = factory_func(url, data=data or {}, **request_kwargs)
         request.user = user
+
+        if as_view_kwargs is not None:
+            return view.as_view(as_view_kwargs)(request, **view_kwargs)
 
         return view.as_view()(request, **view_kwargs)
 
