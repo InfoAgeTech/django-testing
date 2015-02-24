@@ -1,6 +1,5 @@
-import uuid
-
 from django.contrib.auth import get_user_model
+import uuid
 
 
 def random_string(length=10):
@@ -9,7 +8,7 @@ def random_string(length=10):
 
 def create_user(username=None, email=None, is_staff=False, is_superuser=False,
                 **kwargs):
-
+    """Creates a user for testing purposes."""
     if not username:
         username = random_string()
 
@@ -40,3 +39,10 @@ def create_user(username=None, email=None, is_staff=False, is_superuser=False,
         user.save()
 
     return user
+
+
+def create_superuser(username=None, email=None, **kwargs):
+    """Creates a super user for testing purposes."""
+    kwargs['is_staff'] = True
+    kwargs['is_superuser'] = True
+    return create_user(username=username, email=email, **kwargs)

@@ -1,30 +1,30 @@
 from __future__ import unicode_literals
 
-from django.test import Client
 from django.test.testcases import TestCase
 
 from ..user_utils import create_user
 
 
-class UnauthenticatedUserTestCase(TestCase):
-
+class UserTestCase(TestCase):
+    """Test case that includes a user that can be accessed on the class as
+    cls.user.
+    """
     @classmethod
     def setUpClass(cls):
-        super(UnauthenticatedUserTestCase, cls).setUpClass()
-        cls.user_client = Client()
-
-
-class AuthenticatedUserTestCase(TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        super(AuthenticatedUserTestCase, cls).setUpClass()
+        super(UserTestCase, cls).setUpClass()
         cls.user_password = 'testinghelloworld'
         cls.user = create_user(password=cls.user_password)
-        cls.user_client = Client()
-        user_to_authenticate, user_password = cls.get_user_to_authenticate()
-        cls.user_client.login(username=user_to_authenticate.username,
-                              password=user_password)
+
+
+class AuthenticatedUserTestCase(UserTestCase):
+    """Test case that authenticates the test client."""
+    authenticated_client = None
+
+    def setUp(self):
+        super(AuthenticatedUserTestCase, self).setUp()
+        user_to_authenticate, user_password = self.get_user_to_authenticate()
+        self.client.login(username=user_to_authenticate.username,
+                          password=user_password)
 
     @classmethod
     def get_user_to_authenticate(cls):

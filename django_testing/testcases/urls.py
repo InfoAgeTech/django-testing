@@ -53,8 +53,8 @@ class HttpResponseTestMixin(object):
             kwargs['data'] = data
 
         # Gets the function off self.client for the specific http method.
-        # Method == "get" will return the self.user_client's "get(...)" method.
-        http_method_func = getattr(self.user_client, method.lower())
+        # Method == "get" will return the self.client's "get(...)" method.
+        http_method_func = getattr(self.client, method.lower())
         response = http_method_func(url, **kwargs)
         is_correct_status_code = response.status_code == expected_status_code
 
