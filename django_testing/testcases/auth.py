@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import django
 from django.test.testcases import TestCase
 
 from ..user_utils import create_user
@@ -12,6 +13,18 @@ class UserTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(UserTestCase, cls).setUpClass()
+        if django.VERSION < (1, 8):
+            cls.addClassUser()
+
+    @classmethod
+    def setUpTestData(cls):
+        """Django 1.8 way of adding test data to class."""
+        super(UserTestCase, cls).setUpTestData()
+        cls.addClassUser()
+
+    @classmethod
+    def addClassUser(cls):
+        """Adds a user to the class for the test case."""
         cls.user_password = 'testinghelloworld'
         cls.user = create_user(password=cls.user_password)
 
