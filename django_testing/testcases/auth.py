@@ -13,7 +13,8 @@ class UserTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(UserTestCase, cls).setUpClass()
-        if django.VERSION < (1, 8):
+
+        if not hasattr(cls, 'user'):
             cls.addClassUser()
 
     @classmethod
