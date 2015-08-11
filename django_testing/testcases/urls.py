@@ -156,7 +156,7 @@ class UrlTestCaseMixin(HttpResponseTestMixin):
 
             return url_pattern_names
 
-    def test_all_views_tested(self):
+    def test_all_views_tested(self, *args, **kwargs):
         """This test ensures that all urls have a test written for them."""
 
         if not hasattr(self, 'expected_url_tests'):
